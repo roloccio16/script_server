@@ -65,58 +65,13 @@ sudo systemctl enable fail2ban
 # Mostrar el estado de Fail2Ban
 sudo systemctl status fail2ban
 
-sudo ufw allow 2222/tcp
-iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
-
 # Instalar Cowrie
-sudo apt-get install git python3-venv libssl-dev libffi-dev build-essential libpython3-dev python3-minimal authbind
-
-sudo adduser --disabled-password cowrie
-
-sudo su - cowrie -c "
-git clone http://github.com/cowrie/cowrie
-
-cd cowrie
-
-pwd
-# debemos de estar en /home/cowrie/cowrie
-python3 -m venv cowrie-env
-
-source cowrie-env/bin/activate
-python3 -m pip install --upgrade pip
-python3 -m pip install --upgrade -r requirements.txt
-bin/cowrie start
-"
-#
-#sudo cat /etc/shadow
-
-#hashcat --identify hash.txt
-
-
-#sudo nano /etc/login.defs
-
-#buscar linea ENCRYTP_METHOD
-#Cambiar a SHA256
-#172.233.
-#scp -P 397 root_passwords.txt 10.0.2.28:/home/user/codewordlist
-# -r pa carpetas
-
-#for i in {1..250}; do
-#  echo "Probando https://geomancia.neocities.org/wordlist-$i.txt..."
-#  status=$(curl -o /dev/null -s -w "%{http_code}" "https://geomancia.neocities.org/wordlist-$i.txt")
-#  if [ "$status" -eq 200 ]; then
-#    echo "Encontrado: https://geomancia.neocities.org/wordlist-$i.txt"
-#    break
-#  fi
-#done
-
-#for i in {251..500}; do
-#  echo "Probando https://geomancia.neocities.org/wordlist-$i.txt..."
-#  status=$(curl -o /dev/null -s -w "%{http_code}" "https://geomancia.neocities.org/wordlist-$i.txt")
-#  if [ "$status" -eq 200 ]; then
-#    echo "Encontrado: https://geomancia.neocities.org/wordlist-$i.txt"
-#    break
-# fi
-#done
-
-#wget -O wordlist.txt (ruta)
+apt install -y git python3-venv python3-dev libssl-dev libffi-dev build-essential
+    adduser --disabled-password --gecos "" cowrie
+    su - cowrie -c "git clone https://github.com/cowrie/cowrie.git /home/cowrie/cowrie"
+    su - cowrie -c "cd /home/cowrie/cowrie && python3 -m venv cowrie-env"
+    su - cowrie -c "cd /home/cowrie/cowrie && source cowrie-env/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
+    ufw allow 2222/tcp
+    ufw reload
+    iptables -t nat -A PREROUTING -p tcp --dport 22 -j REDIRECT --to-port 2222
+    su - cowrie -c "/home/cowrie/cowrie/bin/cowrie start"
